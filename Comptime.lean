@@ -9,7 +9,7 @@ inductive Eval : RExpr → Env Value → Value → Prop where
   | num : Eval (.num n) _ (.num n)
   | add (h₁ : Eval r₁ renv (.num n₁)) (h₂ : Eval r₂ renv (.num n₂))
         (hadd : n₃ = n₁ + n₂) :
-        Eval (r₁ + r₂) renv (.num n₃)
+        Eval (r₁ +_ r₂) renv (.num n₃)
   | pair (h₁ : Eval r₁ renv v₁) (h₂ : Eval r₂ renv v₂) :
          Eval (.pair r₁ r₂) renv (.pair v₁ v₂)
   | fst (h : Eval r renv (.pair v₁ v₂)) : Eval (.fst r) renv v₁
@@ -25,9 +25,9 @@ inductive Comp : Expr → Env RExpr → RExpr → Prop where
   | num : Comp (.num n) _ (.num n)
   | num' : Comp $⟨.num n⟩ _ (.num n)
   | add (h₁ : Comp e₁ cenv r₁) (h₂ : Comp e₂ cenv r₂) :
-        Comp (e₁ + e₂) cenv (r₁ + r₂)
+        Comp (e₁ +_ e₂) cenv (r₁ +_ r₂)
   | add' (h₁ : Comp e₁ cenv r₁) (h₂ : Comp e₂ cenv r₂) :
-         Comp $⟨e₁ + e₂⟩ cenv (r₁ + r₂)
+         Comp $⟨e₁ +_ e₂⟩ cenv (r₁ +_ r₂)
   | pair (h₁ : Comp e₁ cenv r₁) (h₂ : Comp e₂ cenv r₂) :
          Comp (.pair e₁ e₂) cenv (.pair r₁ r₂)
   | pair' (h₁ : Comp e₁ cenv r₁) (h₂ : Comp e₂ cenv r₂) :
@@ -55,10 +55,10 @@ inductive TyCheck : Expr → Env Ty → Env Ty → Ty → Prop where
   | num' : TyCheck $⟨.num _⟩ _ _ $⟨.num⟩
   | add (h₁ : TyCheck e₁ renv cenv .num)
         (h₂ : TyCheck e₂ renv cenv .num) :
-        TyCheck (e₁ + e₂) renv cenv .num
+        TyCheck (e₁ +_ e₂) renv cenv .num
   | add' (h₁ : TyCheck $⟨e₁⟩ renv cenv $⟨.num⟩)
          (h₂ : TyCheck $⟨e₂⟩ renv cenv $⟨.num⟩) :
-         TyCheck $⟨e₁ + e₂⟩ renv cenv $⟨.num⟩
+         TyCheck $⟨e₁ +_ e₂⟩ renv cenv $⟨.num⟩
   | pair (h₁ : TyCheck e₁ renv cenv t₁)
          (h₂ : TyCheck e₂ renv cenv t₂) :
          TyCheck (.pair e₁ e₂) renv cenv (.pair t₁ t₂)
@@ -96,7 +96,7 @@ example : Eval (.var "x") (∅{"x" ↦ 2}) 2 := by {
   constructor <;> simp
 }
 
-example : Eval ((Λ ("x" : (.num t→ .num)) => (RExpr.var "x") + 1) @ 42) ∅ 43 := by {
+example : Eval ((Λ ("x" : (.num t→ .num)) => (.var "x") +_ 1) @ 42) ∅ 43 := by {
   constructor <;> constructor <;> constructor <;> simp
 }
 

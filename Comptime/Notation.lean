@@ -14,7 +14,7 @@ def getImpl (proc : Name → Syntax → Expr → TermElabM (TSyntax `term)) : Te
     elabTerm stx typ
 
 section app_notation
-  syntax (name := app_notation) term "@" term : term
+  syntax (name := app_notation) term " @ " term : term
 
   @[term_elab app_notation]
   def applicationImpl : TermElab := getImpl (fun base stx typ =>

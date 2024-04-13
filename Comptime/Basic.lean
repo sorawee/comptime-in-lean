@@ -29,6 +29,7 @@ section expr
   instance : OfNat Expr n where
     ofNat := .num n
 
+  @[simp]
   def Expr.let (x : String) (t : Ty) (v body : Expr) : Expr :=
     Expr.app (Expr.lam x t body) v
 end expr
@@ -52,6 +53,7 @@ section rexpr
   instance : OfNat RExpr n where
     ofNat := .num n
 
+  @[simp]
   def RExpr.let (x : String) (t : Ty) (v body : RExpr) : RExpr :=
     RExpr.app (RExpr.lam x t body) v
 end rexpr

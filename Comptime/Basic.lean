@@ -1,5 +1,7 @@
 import Comptime.Env
 
+namespace Comptime
+
 section type
   inductive Ty where
     | num : Ty
@@ -10,9 +12,6 @@ section type
 
   notation:10 x " t→ " y =>
     Ty.arrow x y
-
-  notation:10 "$t" "⟨" t "⟩" =>
-    Ty.comp t
 end type
 
 section expr
@@ -27,26 +26,14 @@ section expr
     | var (name : String) : Expr
     | comp (e : Expr) : Expr
 
-  notation:10 "eλ" "(" x " : " t ")" " => " body =>
-    Expr.lam x t body
-
-  notation:10 x " e+ " y =>
-    Expr.add x y
-
-  notation:10 x " e@ " y =>
-    Expr.app x y
-
-  notation:10 "$e" "⟨" e "⟩" =>
-    Expr.comp e
-
   instance : OfNat Expr n where
     ofNat := .num n
 
-  def Expr.let (x : String) (t : Ty) (v body : Expr) : Expr :=
-    (eλ (x : t) => body) e@ v
+  instance : Add Expr where
+    add := Expr.add
 
-  notation:10 "elet" x " :~ " t " := " v " in " body  =>
-    Expr.let x t v body
+  def Expr.let (x : String) (t : Ty) (v body : Expr) : Expr :=
+    Expr.app (Expr.lam x t body) v
 end expr
 
 section rexpr
@@ -65,24 +52,14 @@ section rexpr
                    (t : Ty)
                    (e : Expr) : RExpr
 
-  notation:10 "rλ" "(" x " : " t ")" " => " body =>
-    RExpr.lam x t body
-
-  notation:10 x " r+ " y =>
-    RExpr.add x y
-
-  notation:10 x " r@ " y =>
-    RExpr.app x y
-
   instance : OfNat RExpr n where
     ofNat := .num n
 
+  instance : Add RExpr where
+    add := RExpr.add
+
   def RExpr.let (x : String) (t : Ty) (v body : RExpr) : RExpr :=
-    (rλ (x : t) => body) r@ v
-
-  notation:10 "rlet" x " :: " t " := " v " in " body  =>
-    RExpr.let x t v body
-
+    RExpr.app (RExpr.lam x t body) v
 end rexpr
 
 section value
@@ -98,3 +75,5 @@ section value
   instance : OfNat Value n where
     ofNat := .num n
 end value
+
+end Comptime
